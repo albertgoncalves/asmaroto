@@ -1,7 +1,8 @@
 with import <nixpkgs> {};
-mkShell {
+mkShell.override { stdenv = llvmPackages_14.stdenv; } {
     buildInputs = [
         fasm
+        mold
         shellcheck
     ];
     shellHook = ''

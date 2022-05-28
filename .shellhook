@@ -12,4 +12,12 @@ runa () {
         && "$WD/bin/${handle}"
 }
 
+runc () {
+    handle=$(echo "$1" | sed 's/^[a-z\/]*\/\(.*\)\.[a-z]*$/\1/')
+    fasm "$1" "$WD/bin/${handle}".o \
+        && mold -run clang "$WD/bin/${handle}".o -o "$WD/bin/${handle}" \
+        && "$WD/bin/${handle}"
+}
+
 export -f runa
+export -f runc
