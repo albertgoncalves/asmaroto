@@ -1,3 +1,5 @@
+format ELF64 executable 3
+
 ; fasm demonstration of writing 64-bit ELF executable
 ; (thanks to Franti|¡ek G|¡bri|¡)
 
@@ -12,20 +14,8 @@
 ;   eax   ; syscall_number
 ;   syscall
 
-format ELF64 executable 3
-
-
-segment readable writeable
-
-string0 db  "Hello 64-bit"
-len0    =   $ - string0
-
-string1 db  " world!", 0xA
-len1    =   $ - string1
-
 string  equ string0
 len     equ (len0 + len1)
-
 
 segment readable executable
 
@@ -40,3 +30,11 @@ entry $
     xor     edi,    edi         ; exit code 0
     mov     eax,    60          ; sys_exit
     syscall
+
+segment readable writeable
+
+string0 db  "Hello, 64-bit"
+len0    =   $ - string0
+
+string1 db  " world!", 0xA
+len1    =   $ - string1

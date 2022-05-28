@@ -8,8 +8,8 @@ fi
 
 runa () {
     handle=$(echo "$1" | sed 's/^[a-z\/]*\/\(.*\)\.[a-z]*$/\1/')
-    fasm "$1" "$WD/bin/${handle}"
-    "$WD/bin/${handle}"
+    fasm "$1" "$WD/bin/${handle}" \
+        && "$WD/bin/${handle}"
 }
 
 export -f runa
