@@ -47,6 +47,7 @@ main:
         xor     rax,            rax
         call    printf
 
+        xor     rax,            rax
         add     rsp,            16
         EPILOGUE
 
