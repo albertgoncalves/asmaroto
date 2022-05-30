@@ -15,6 +15,12 @@ macro STACK_SYSCALL2 {
         syscall
 }
 
+macro STACK_PRINT_STR {
+        pop     rdi
+        mov     rax, 0
+        call    printf
+}
+
 macro STACK_PRINTLN_I64 {
         pop     rsi
         mov     rdi, FORMAT_I64
@@ -35,6 +41,7 @@ macro STACK_ADD {
         pop     rdx
         pop     rax
         add     rax, rdx
+        jo      exit_overflow
         push    rax
 }
 
@@ -42,6 +49,7 @@ macro STACK_SUB {
         pop     rdx
         pop     rax
         sub     rax, rdx
+        jo      exit_overflow
         push    rax
 }
 
@@ -64,6 +72,14 @@ macro STACK_IMOD {
 }
 
 section '.text' executable
+
+exit_overflow:
+        push        OVERFLOW
+        STACK_PRINT_STR
+
+        push        SYS_EXIT    ; [SYS_EXIT]
+        push        ERROR       ; [SYS_EXIT, ERROR]
+        STACK_SYSCALL2          ; []
 
 main:
         push        rbp
@@ -114,3 +130,4 @@ main:
 section '.data' writeable
 
 FORMAT_I64 db "%d", 10, 0
+OVERFLOW   db "Overflow!", 10, 0
