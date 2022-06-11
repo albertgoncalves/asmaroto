@@ -21,6 +21,7 @@ main:
     push        [Z]
     and         rsp, -16            ; enforce 16-byte alignment
 
+    ; NOTE: See `https://en.wikibooks.org/wiki/X86_Assembly/SSE`.
     movss       xmm0, [rbp - 8]
     movss       xmm1, [rbp - 16]
     movsd       xmm2, [rbp - 24]
