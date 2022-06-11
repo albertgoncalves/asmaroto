@@ -2,5 +2,9 @@
 !.gitignore
 !*.nix
 !.shellhook
+!.clang-format
+!scripts/
+!*.sh
 !src/
 !*.asm
+!*.c
