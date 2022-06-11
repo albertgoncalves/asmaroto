@@ -2,14 +2,14 @@ format ELF64
 
 section '.text' executable
 
-public main
+public _start
 
 extrn getpid
 extrn printf
 
-main:
-    push    rbp
+SYS_EXIT equ 60
 
+_start:
     call    getpid
     mov     rsi,    rax
 
@@ -18,8 +18,9 @@ main:
     xor     eax,    eax
     call    printf
 
-    pop     rbp
-    ret
+    xor     edi,    edi
+    mov     eax,    SYS_EXIT
+    syscall
 
 section '.data' writeable
 

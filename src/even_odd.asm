@@ -1,8 +1,10 @@
 format ELF64
 
-public main
+public _start
 
 extrn printf
+
+SYS_EXIT equ 60
 
 BUFFER_CAP equ 1024
 
@@ -23,6 +25,12 @@ macro EPILOGUE {
                         ;       add     rsp,    8
         ret
 }
+
+_start:
+        call    main
+        xor     edi,    edi
+        mov     eax,    SYS_EXIT
+        syscall
 
 main:
         PROLOGUE

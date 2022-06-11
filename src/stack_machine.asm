@@ -1,6 +1,6 @@
 format ELF64
 
-public main
+public _start
 
 extrn printf
 
@@ -73,6 +73,12 @@ macro STACK_IMOD {
 
 section '.text' executable
 
+_start:
+        call        main
+        push        SYS_EXIT    ; [SYS_EXIT]
+        push        OK          ; [SYS_EXIT, OK]
+        STACK_SYSCALL2          ; []
+
 exit_overflow:
         push        OVERFLOW
         STACK_PRINT_STR
@@ -120,12 +126,9 @@ main:
         STACK_SUB               ; [rbp-rsp]
         STACK_PRINTLN_I64       ; []
 
-        push        SYS_EXIT    ; [SYS_EXIT]
-        push        OK          ; [SYS_EXIT, OK]
-        STACK_SYSCALL2          ; []
-        ; mov     rsp, rbp
-        ; pop     rbp
-        ; ret
+        mov     rsp, rbp
+        pop     rbp
+        ret
 
 section '.data' writeable
 
