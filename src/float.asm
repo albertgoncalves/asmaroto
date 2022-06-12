@@ -8,8 +8,7 @@ SYS_EXIT equ 60
 
 FMT db "%f", 0xA, "%.4f", 0xA, "%.9f", 0xA, 0
 X   dd -0.1234
-Y   dd 0.5678
-Z   dq 0.987654321
+Y   dq 0.987654321
 
 main:
     push        rbp
@@ -17,8 +16,9 @@ main:
 
     mov         rdi, FMT
     push        qword [X]
-    push        qword [Y]
-    push        [Z]
+    ; NOTE: See `https://www.felixcloutier.com/x86/push`.
+    push        1058102103          ; 0.5678
+    push        [Y]
     and         rsp, -16            ; enforce 16-byte alignment
 
     ; NOTE: See `https://en.wikibooks.org/wiki/X86_Assembly/SSE`.
