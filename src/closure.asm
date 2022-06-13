@@ -134,7 +134,7 @@ _start:
 
 ;   _f0_ := (\_s0_ x ->
 ;       _s1_ := (@newScopeFrom _s0_);
-;       _s1_ := (@insertScope _s1_ "x" x);
+;       (@insertScope _s1_ "x" x);
 ;       (_s1_, _f1_)
 ;   );
 _f0_:
@@ -148,6 +148,7 @@ _f0_:
         call    scope_new_from
         push    rax             ; [_s0_, x, _s1_]
 
+    ; (@insertScope _s1_ "x" x);
         mov     rdi, [rbp - 24]
         mov     rsi, STR_X
         mov     rdx, LEN_X
