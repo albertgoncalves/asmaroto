@@ -12,27 +12,40 @@ FMT db "%ld", 0xA, 0
 
 section '.text' executable
 
+;   u64 fib(u64 n) {
+;       return _fib(n, 0, 1);
+;   }
 fib:
-        mov     rcx, 0      ; a
+        mov     rsi, 0      ; a
         mov     rdx, 1      ; b
-    fib_loop:
-        mov     rax, rcx    ; c = a
+        call    _fib
+        ret
 
-        test    rdi, rdi
-        jz      fib_ret
+;   u64 _fib(u64 n, u64 a, u64 b) {
+;       if (n == 0) {
+;           return a;
+;       }
+;       return _fib(n - 1, b, a + b)
+;   }
+_fib:
+        test    rdi, rdi    ; if (n == 0) {
+        jz      _fib_ret    ;     return a;
+                            ; }
+        push    rsi         ; c = a;
+        mov     rsi, rdx    ; a = b;
 
-        add     rax, rdx    ; c = a + b
-        mov     rcx, rdx    ; a = b
-        mov     rdx, rax    ; b = c
+        add     rdx, [rsp]  ; b += c;
+        dec     rdi         ; n -= 1;
 
-        dec     rdi
+        add     rsp, 8
 
-        jmp     fib_loop
-        ; call    fib_loop
+        jmp     _fib
+        ; call    _fib
         ; ret
 
-    fib_ret:
-        ret                 ; return c
+    _fib_ret:
+        mov     rax, rsi
+        ret                 ; return a
 
 _start:
         mov     rdi, 50
