@@ -12,9 +12,10 @@ EXIT equ 60
 BUFFER_CAP equ 48
 
 section '.rodata'
-    FMT_I64_2 db "%ld %ld", 0xA, 0
-    FMT_I64_3 db "%ld %ld %ld", 0xA, 0
-    TABLE     dq unpack_0, unpack_1, unpack_2
+    PACK_ERROR db "Allocation overflow by %lu byte(s)", 0xA, 0
+    FMT_I64_2  db "%ld %ld", 0xA, 0
+    FMT_I64_3  db "%ld %ld %ld", 0xA, 0
+    TABLE      dq unpack_0, unpack_1, unpack_2
 
 section '.bss' writeable
     BUFFER rb BUFFER_CAP
@@ -24,14 +25,23 @@ section '.data' writeable
 
 section '.text' executable
 
+pack_error:
+        lea     rsi, [r11 - BUFFER_CAP]
+        mov     rdi, PACK_ERROR
+        xor     eax, eax
+        call    printf
+
+        mov     edi, ERROR
+        mov     eax, EXIT
+        syscall
+
 pack2:
-        mov     rax, BUFFER
         mov     r11, [BUFFER_LEN]
-        add     rax, r11
+        lea     rax, [BUFFER + r11]
 
         add     r11, 2 * 8
         cmp     r11, BUFFER_CAP
-        ja      pack3_error
+        ja      pack_error
 
         mov     qword [BUFFER + r11 - (8 * 1)], rsi
         mov     qword [BUFFER + r11 - (8 * 2)], rdi
@@ -39,19 +49,13 @@ pack2:
 
         ret
 
-    pack2_error:
-        mov     edi, ERROR
-        mov     eax, EXIT
-        syscall
-
 pack3:
-        mov     rax, BUFFER
         mov     r11, [BUFFER_LEN]
-        add     rax, r11
+        lea     rax, [BUFFER + r11]
 
         add     r11, 3 * 8
         cmp     r11, BUFFER_CAP
-        ja      pack3_error
+        ja      pack_error
 
         mov     qword [BUFFER + r11 - (8 * 1)], rdx
         mov     qword [BUFFER + r11 - (8 * 2)], rsi
@@ -59,11 +63,6 @@ pack3:
         mov     qword [BUFFER_LEN], r11
 
         ret
-
-    pack3_error:
-        mov     edi, ERROR
-        mov     eax, EXIT
-        syscall
 
 unpack:
         push    rbp
