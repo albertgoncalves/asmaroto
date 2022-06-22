@@ -4,8 +4,10 @@ public _start
 
 extrn printf
 
-OK      equ 0
-ERROR   equ 1
+OK    equ 0
+ERROR equ 1
+
+EXIT equ 60
 
 BUFFER_CAP equ 48
 
@@ -34,11 +36,12 @@ pack2:
         mov     qword [BUFFER + r11 - (8 * 1)], rsi
         mov     qword [BUFFER + r11 - (8 * 2)], rdi
         mov     qword [BUFFER_LEN], r11
+
         ret
 
     pack2_error:
         mov     edi, ERROR
-        mov     eax, 60
+        mov     eax, EXIT
         syscall
 
 pack3:
@@ -54,11 +57,12 @@ pack3:
         mov     qword [BUFFER + r11 - (8 * 2)], rsi
         mov     qword [BUFFER + r11 - (8 * 3)], rdi
         mov     qword [BUFFER_LEN], r11
+
         ret
 
     pack3_error:
         mov     edi, ERROR
-        mov     eax, 60
+        mov     eax, EXIT
         syscall
 
 unpack:
@@ -85,7 +89,7 @@ unpack:
 
     unpack_1:
         mov     edi, ERROR
-        mov     eax, 60
+        mov     eax, EXIT
         syscall
 
     unpack_2:
@@ -99,6 +103,7 @@ unpack:
         mov     rdi, FMT_I64_3
         xor     eax, eax
         call    printf
+
         jmp     unpack_end
 
     unpack_end:
@@ -124,5 +129,5 @@ _start:
         call    unpack
 
         mov     rdi, OK
-        mov     eax, 60
+        mov     eax, EXIT
         syscall
