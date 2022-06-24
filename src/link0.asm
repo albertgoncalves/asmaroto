@@ -1,20 +1,22 @@
 format ELF64
 
 public _start
+public MSG1
 
 extrn printf
 
 extrn f
 
 section '.rodata'
-    MSG db "Printed from main file!", 0xA, 0
+    MSG0 db "Printed from main file!", 0xA, 0
+    MSG1 db "Printed from linked file!", 0xA, 0
 
 section '.text' executable
 
 _start:
         call    f
 
-        mov     rdi, MSG
+        mov     rdi, MSG0
         xor     eax, eax
         call    printf
 
