@@ -1,6 +1,7 @@
 format ELF64
 
 public _start
+public MEMORY
 
 extrn printf
 
@@ -14,17 +15,23 @@ extrn scope_update   ; void   scope_update(Scope*, char*, u64, i64)
 
 SYS_EXIT equ 60
 
-STR_F db "f"
-LEN_F =  $ - STR_F
+section '.rodata'
+    STR_F db "f"
+    LEN_F =  $ - STR_F
 
-STR_G db "g"
-LEN_G =  $ - STR_G
+    STR_G db "g"
+    LEN_G =  $ - STR_G
 
-STR_X db "x"
-LEN_X =  $ - STR_X
+    STR_X db "x"
+    LEN_X =  $ - STR_X
 
-STR_I64     db "%ld", 0
-STR_NEWLINE db 0xA, 0
+    STR_I64     db "%ld", 0
+    STR_NEWLINE db 0xA, 0
+
+section '.bss' writeable
+    MEMORY rb 280
+
+section '.text' executable
 
 ;   _s0_ := (@newScope ());
 ;   (@insertScope _s0_ "f" (_s0_, _f0_));

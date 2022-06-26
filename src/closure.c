@@ -53,7 +53,7 @@ typedef struct {
     u64   len_buffer;
 } Memory;
 
-static Memory MEMORY = {0};
+extern Memory MEMORY;
 
 void   memory_init(void);
 i64*   alloc_buffer_2(i64, i64);
