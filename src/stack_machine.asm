@@ -130,7 +130,7 @@ main:
         pop     rbp
         ret
 
-section '.data' writeable
+section '.rodata'
 
 FORMAT_I64 db "%d", 10, 0
 OVERFLOW   db "Overflow!", 10, 0

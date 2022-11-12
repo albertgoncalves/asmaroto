@@ -6,7 +6,7 @@ extrn printf
 
 SYS_EXIT equ 60
 
-section '.data' writeable
+section '.rodata'
 
 FMT db "%ld", 0xA, 0
 

@@ -81,7 +81,7 @@ is_odd:
         mov     rax,        0
         EPILOGUE
 
-section '.data' writeable
+section '.rodata'
 
 STR_FMT  db "%d is %s", 0xA, 0
 STR_EVEN db "even", 0

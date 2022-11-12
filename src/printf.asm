@@ -22,7 +22,7 @@ _start:
     mov     eax,    SYS_EXIT
     syscall
 
-section '.data' writeable
+section '.rodata'
 
 _format db "[pid: %d]", 0xA, "%s", 0xA, 0
 _string db "Hello, world!"
