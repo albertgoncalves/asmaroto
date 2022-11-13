@@ -1,7 +1,7 @@
 *
 !.gitignore
-!*.nix
 !.shellhook
+!README.md
 !.clang-format
 !scripts/
 !*.sh
