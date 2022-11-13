@@ -10,18 +10,12 @@ flags_c=(
     -Werror
     -Weverything
     -Wno-declaration-after-statement
-    -Wno-extra-semi-stmt
     -Wno-unused-macros
-)
-flags_asm=(
-    "-fuse-ld=mold"
-    --no-warn-rwx-segments
-    -znoexecstack
 )
 
 clang-format -i -verbose "$WD/src/"*.c
 clang "${flags_c[@]}" -c -o "$WD/bin/c_closure.o" "$WD/src/closure.c"
 fasm "$WD/src/closure.asm" "$WD/bin/asm_closure.o"
-ld "${flags_asm[@]}" -o "$WD/bin/closure" -lc "$WD/bin/c_closure.o" \
+mold -run clang -o "$WD/bin/closure" "$WD/bin/c_closure.o" \
     "$WD/bin/asm_closure.o"
 "$WD/bin/closure" || echo "$?"

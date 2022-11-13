@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -31,7 +31,7 @@ f:
     f_end:
         ret
 
-_start:
+main:
         mov     rdi, 0
         ; mov     rdi, 1
         call    f

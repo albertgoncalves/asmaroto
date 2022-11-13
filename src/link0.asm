@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 public MSG1
 
 extrn printf
@@ -13,7 +13,7 @@ section '.rodata'
 
 section '.text' executable
 
-_start:
+main:
         call    f
 
         mov     rdi, MSG0

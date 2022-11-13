@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 public MEMORY
 
 extrn printf
@@ -38,7 +38,7 @@ section '.text' executable
 ;   (@insertScope _s0_ "g" (_s0_, _f2_));
 ;   print (((@lookupScope _s0_ "f") ((@lookupScope _s0_ "g") ())) ());
 ;   print "\n"
-_start:
+main:
         push    rbp             ; [???]
         mov     rbp, rsp        ; []
 

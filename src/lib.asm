@@ -2,7 +2,7 @@ format ELF64
 
 section '.text' executable
 
-public _start
+public main
 
 extrn printf
 extrn c_func
@@ -13,7 +13,7 @@ FMT_ASM db "  [.asm]", 0xA, "This value was computed in `.c`: %d", 0xA, 0
 FMT_C   db "Hello, world!"
 LEN_C   =  $ - FMT_C
 
-_start:
+main:
     mov     edi, -456   ; x0
     mov     esi, 450    ; x1
     mov     edx, 6      ; x2

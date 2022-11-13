@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -9,7 +9,7 @@ ERROR    equ 1
 
 EXIT     equ 60
 
-HEAP_CAP equ 256
+HEAP_CAP equ 512
 
 section '.rodata'
     FMT db 0xA, "rsp - rbp  : %ld", 0xA, "stack[-4:] : [ %ld, %ld, %ld, %ld ]", 0xA, 0
@@ -37,7 +37,7 @@ macro PRINT_STACK {
     call    printf
 }
 
-_start:
+main:
     mov     rbp, rsp
 
     push    5

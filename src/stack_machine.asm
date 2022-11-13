@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -73,12 +73,6 @@ macro STACK_IMOD {
 
 section '.text' executable
 
-_start:
-        call        main
-        push        SYS_EXIT    ; [SYS_EXIT]
-        push        OK          ; [SYS_EXIT, OK]
-        STACK_SYSCALL2          ; []
-
 exit_overflow:
         push        OVERFLOW
         STACK_PRINT_STR
@@ -129,6 +123,10 @@ main:
         mov     rsp, rbp
         pop     rbp
         ret
+
+        push        SYS_EXIT    ; [SYS_EXIT]
+        push        OK          ; [SYS_EXIT, OK]
+        STACK_SYSCALL2          ; []
 
 section '.rodata'
 
