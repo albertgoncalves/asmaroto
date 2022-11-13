@@ -13,7 +13,6 @@ typedef int64_t i64;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
-#define OK    0
 #define ERROR 1
 
 #define EXIT()                                              \

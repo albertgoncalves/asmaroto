@@ -10,7 +10,6 @@ flags_c=(
     -Werror
     -Weverything
     -Wno-declaration-after-statement
-    -Wno-unused-macros
 )
 
 clang-format -i -verbose "$WD/src/"*.c
