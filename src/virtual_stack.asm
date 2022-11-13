@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -37,7 +37,7 @@ macro PRINT_STACK {
     call    printf
 }
 
-_start:
+main:
     mov     rbp, rsp
 
     push    5

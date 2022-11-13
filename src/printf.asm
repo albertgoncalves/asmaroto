@@ -2,14 +2,14 @@ format ELF64
 
 section '.text' executable
 
-public _start
+public main
 
 extrn getpid
 extrn printf
 
 SYS_EXIT equ 60
 
-_start:
+main:
     call    getpid
     mov     rsi,    rax
 

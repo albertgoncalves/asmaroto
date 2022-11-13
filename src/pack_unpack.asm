@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -109,7 +109,7 @@ unpack:
         leave
         ret
 
-_start:
+main:
         mov     rdi, 0
         mov     rsi, -123
         call    pack2

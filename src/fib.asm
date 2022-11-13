@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -47,7 +47,7 @@ _fib:
         mov     rax, rsi
         ret                 ; return a
 
-_start:
+main:
         mov     rdi, 50
         call    fib
 

@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -35,8 +35,6 @@ main:
     pop         rbp
     ret
 
-_start:
-    call        main
     xor         edi, edi
     mov         eax, SYS_EXIT
     syscall

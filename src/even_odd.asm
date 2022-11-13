@@ -1,6 +1,6 @@
 format ELF64
 
-public _start
+public main
 
 extrn printf
 
@@ -25,12 +25,6 @@ macro EPILOGUE {
                         ;       add     rsp,    8
         ret
 }
-
-_start:
-        call    main
-        xor     edi,    edi
-        mov     eax,    SYS_EXIT
-        syscall
 
 main:
         PROLOGUE
@@ -80,6 +74,10 @@ is_odd:
     is_odd_ret:
         mov     rax,        0
         EPILOGUE
+
+        xor     edi,    edi
+        mov     eax,    SYS_EXIT
+        syscall
 
 section '.rodata'
 
