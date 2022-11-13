@@ -6,11 +6,20 @@ extrn printf
 
 section '.rodata'
     TABLE   dq t0, t1
-    STR_I32 db '%d', 0xA, 0
+    STR_I32 db '  %d', 0xA, 0
     STR_T0  db '@t0', 0xA, 0
     STR_T1  db '@t1', 0xA, 0
 
 section '.text' executable
+
+macro F_PRINT {
+        call    f
+
+        mov     rsi, rax
+        mov     rdi, STR_I32
+        xor     eax, eax
+        call    printf
+}
 
 f:
         jmp     [TABLE + (rdi * 8)]
@@ -33,14 +42,10 @@ f:
 
 main:
         mov     rdi, 0
-        ; mov     rdi, 1
-        call    f
+        F_PRINT
 
-        mov     rsi, rax
-        mov     rdi, STR_I32
+        mov     rdi, 1
+        F_PRINT
+
         xor     eax, eax
-        call    printf
-
-        mov     rdi, rax
-        mov     eax, 60
-        syscall
+        ret
