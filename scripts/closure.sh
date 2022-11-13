@@ -10,7 +10,6 @@ flags_c=(
     -Werror
     -Weverything
     -Wno-declaration-after-statement
-    -Wno-extra-semi-stmt
     -Wno-unused-macros
 )
 flags_asm=(

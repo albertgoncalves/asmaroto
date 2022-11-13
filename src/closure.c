@@ -17,16 +17,22 @@ typedef uint64_t u64;
 #define ERROR 1
 
 #define EXIT()                                              \
-    {                                                       \
+    do {                                                    \
         printf("%s:%s:%d\n", __FILE__, __func__, __LINE__); \
         _exit(ERROR);                                       \
-    }
+    } while (0)
 
-#define EXIT_IF(condition)                                                   \
-    if (condition) {                                                         \
-        printf("%s:%s:%d `%s`\n", __FILE__, __func__, __LINE__, #condition); \
-        _exit(ERROR);                                                        \
-    }
+#define EXIT_IF(condition)            \
+    do {                              \
+        if (condition) {              \
+            printf("%s:%s:%d `%s`\n", \
+                   __FILE__,          \
+                   __func__,          \
+                   __LINE__,          \
+                   #condition);       \
+            _exit(ERROR);             \
+        }                             \
+    } while (0)
 
 typedef struct List List;
 
