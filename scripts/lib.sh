@@ -14,5 +14,5 @@ flags_c=(
 clang-format -i -verbose "$WD/src/"*.c
 clang "${flags_c[@]}" -c -o "$WD/bin/c_lib.o" "$WD/src/lib.c"
 fasm "$WD/src/lib.asm" "$WD/bin/asm_lib.o"
-mold -run clang -o "$WD/bin/lib" "$WD/bin/c_lib.o" "$WD/bin/asm_lib.o"
+mold -run clang -no-pie -o "$WD/bin/lib" "$WD/bin/c_lib.o" "$WD/bin/asm_lib.o"
 "$WD/bin/lib"

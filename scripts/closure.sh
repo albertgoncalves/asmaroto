@@ -15,6 +15,6 @@ flags_c=(
 clang-format -i -verbose "$WD/src/"*.c
 clang "${flags_c[@]}" -c -o "$WD/bin/c_closure.o" "$WD/src/closure.c"
 fasm "$WD/src/closure.asm" "$WD/bin/asm_closure.o"
-mold -run clang -o "$WD/bin/closure" "$WD/bin/c_closure.o" \
+mold -run clang -no-pie -o "$WD/bin/closure" "$WD/bin/c_closure.o" \
     "$WD/bin/asm_closure.o"
 "$WD/bin/closure" || echo "$?"
