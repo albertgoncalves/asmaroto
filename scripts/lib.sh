@@ -11,7 +11,7 @@ flags_c=(
     -Weverything
 )
 
-clang-format -i -verbose "$WD/src/"*.c
+clang-format -i -verbose "$WD/src/"lib.c
 clang "${flags_c[@]}" -c -o "$WD/bin/c_lib.o" "$WD/src/lib.c"
 fasm "$WD/src/lib.asm" "$WD/bin/asm_lib.o"
 mold -run clang -no-pie -o "$WD/bin/lib" "$WD/bin/c_lib.o" "$WD/bin/asm_lib.o"

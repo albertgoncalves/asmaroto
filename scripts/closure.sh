@@ -12,7 +12,7 @@ flags_c=(
     -Wno-declaration-after-statement
 )
 
-clang-format -i -verbose "$WD/src/"*.c
+clang-format -i -verbose "$WD/src/"closure.c
 clang "${flags_c[@]}" -c -o "$WD/bin/c_closure.o" "$WD/src/closure.c"
 fasm "$WD/src/closure.asm" "$WD/bin/asm_closure.o"
 mold -run clang -no-pie -o "$WD/bin/closure" "$WD/bin/c_closure.o" \
