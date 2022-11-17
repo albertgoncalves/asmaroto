@@ -13,9 +13,11 @@ extrn push_thread
 SYS_EXIT equ 60
 
 section '.rodata'
-    HELLO0 db "Hello?",  0xA, 0
-    HELLO1 db "How are you?", 0xA, 0
-    HELLO2 db "Say what now?",  0xA, 0
+    HELLO0      db "Hello?", 0xA, 0
+    HELLO1      db "How are you?", 0xA, 0
+    HELLO2      db "Say what now?", 0xA, 0
+    SHOW_CREATE db " ! Created thread %p", 0xA, 0
+    SHOW_KILL   db " ! Killed thread %p", 0xA, 0
 
 section '.bss' writeable
     SCHED_RBP      rq 1
@@ -47,6 +49,12 @@ section '.text' executable
     macro KILL_THREAD {
         mov     rax, [CURRENT_THREAD]
         mov     qword [rax + (8 * 3)], 0
+
+        mov     rdi, SHOW_KILL
+        mov     rsi, rax
+        xor     eax, eax
+        call    printf
+
         JUMP_TO_SCHED
     }
 
@@ -94,7 +102,15 @@ section '.text' executable
 
         mov     rdi, f1_thread
         call    new_thread
-        mov     rdi, rax
+
+        push    rax
+
+        mov     rdi, SHOW_CREATE
+        mov     rsi, [rsp]
+        xor     eax, eax
+        call    printf
+
+        pop     rdi
         mov     rsi, HELLO1
         call    push_thread
 
@@ -116,6 +132,11 @@ section '.text' executable
         mov     rdi, f2_thread
         call    new_thread
 
+        mov     rdi, SHOW_CREATE
+        mov     rsi, rax
+        xor     eax, eax
+        call    printf
+
         ret
 
 
@@ -130,12 +151,25 @@ section '.text' executable
 
         mov     rdi, f0_thread
         call    new_thread
-        mov     rdi, rax
+
+        push    rax
+
+        mov     rdi, SHOW_CREATE
+        mov     rsi, [rsp]
+        xor     eax, eax
+        call    printf
+
+        pop     rdi
         mov     rsi, HELLO0
         call    push_thread ; NOTE: Push function arguments onto the stack.
 
         mov     rdi, f3_thread
         call    new_thread
+
+        mov     rdi, SHOW_CREATE
+        mov     rsi, rax
+        xor     eax, eax
+        call    printf
 
         call    f3_yield
 
@@ -149,8 +183,18 @@ section '.text' executable
         mov     rdi, entry_thread
         call    new_thread
 
+        mov     rdi, SHOW_CREATE
+        mov     rsi, rax
+        xor     eax, eax
+        call    printf
+
         mov     rdi, entry_thread
         call    new_thread
+
+        mov     rdi, SHOW_CREATE
+        mov     rsi, rax
+        xor     eax, eax
+        call    printf
 
         mov     rsp, rbp
         pop     rbp
