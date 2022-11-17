@@ -13,9 +13,9 @@ extrn push_thread
 SYS_EXIT equ 60
 
 section '.rodata'
-    HELLO0 db "Hello, from first thread",  0xA, 0
-    HELLO1 db "Hello, from second thread", 0xA, 0
-    HELLO2 db "Hello, from third thread",  0xA, 0
+    HELLO0 db "Hello?",  0xA, 0
+    HELLO1 db "How are you?", 0xA, 0
+    HELLO2 db "Say what now?",  0xA, 0
 
 section '.bss' writeable
     SCHED_RBP      rq 1
@@ -137,12 +137,17 @@ section '.text' executable
         mov     rdi, f3_thread
         call    new_thread
 
+        call    f3_yield
+
         ret
 
 
     main:
         push    rbp
         mov     rbp, rsp
+
+        mov     rdi, entry_thread
+        call    new_thread
 
         mov     rdi, entry_thread
         call    new_thread
