@@ -10,8 +10,6 @@ extrn new_thread
 extrn scheduler
 extrn push_thread
 
-SYS_EXIT equ 60
-
 section '.rodata'
     HELLO0      db "Hello?", 0xA, 0
     HELLO1      db "How are you?", 0xA, 0
