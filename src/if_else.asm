@@ -16,8 +16,10 @@ section '.text' executable
 
         mov     rax, 123
 
-        cmp     rax, 123
-        jnz     branch_else
+        ; cmp     rax, 123
+        ; jnz     branch_else
+        test    rax, rax        ; if (rax != 0) { ...
+        jz      branch_else
     ; branch_if:
         mov     rdi, BRANCH_IF
         jmp     branch_end
