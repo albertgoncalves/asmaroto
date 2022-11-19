@@ -6,16 +6,24 @@ public CURRENT_THREAD
 
 extrn printf
 
-extrn new_thread
 extrn scheduler
-extrn push_thread
+
+extrn new_thread
+extrn push_thread_stack
+extrn pause_thread
+extrn kill_thread
+
+extrn push_waiting
+
+extrn new_channel
+extrn channel_ready
+extrn push_channel
+extrn pop_channel
 
 section '.rodata'
-    HELLO0      db "Hello?", 0xA, 0
-    HELLO1      db "How are you?", 0xA, 0
-    HELLO2      db "Say what now?", 0xA, 0
-    SHOW_CREATE db " ! Created thread %p", 0xA, 0
-    SHOW_KILL   db " ! Killed thread %p", 0xA, 0
+    PING db " - ping -", 0xA, 0
+    PONG db " - pong -", 0xA, 0
+    DONE db "Done!", 0xA, 0
 
 section '.bss' writeable
     SCHED_RBP      rq 1
@@ -32,8 +40,8 @@ section '.text' executable
 
     macro LOAD_THREAD_STACK {
         mov     rax, [CURRENT_THREAD]
-        mov     rsp, [rax + 8]
-        mov     rbp, [rax + (8 * 2)]
+        mov     rsp, [rax + 8]       ; NOTE: If the `Thread` struct is
+        mov     rbp, [rax + (8 * 2)] ; re-ordered, this will break. Watch out!
     }
 
     macro YIELD address {
@@ -45,157 +53,176 @@ section '.text' executable
     }
 
     macro KILL_THREAD {
-        mov     rax, [CURRENT_THREAD]
-        mov     qword [rax + (8 * 3)], 0
-
-        mov     rdi, SHOW_KILL
-        mov     rsi, rax
-        xor     eax, eax
-        call    printf
+        mov     rdi, [CURRENT_THREAD]
+        call    kill_thread
 
         JUMP_TO_SCHED
     }
 
 
-    f0_thread:
-        LOAD_THREAD_STACK
-        pop     rdi ; NOTE: Function arguments are already on the stack.
-        call    f0_yield
-        KILL_THREAD
-    f0_yield:
-        push    rdi ; NOTE: Push function arguments onto the stack.
-        YIELD   f0_body
-    f0_body:
-        LOAD_THREAD_STACK
-        pop     rdi
-        xor     eax, eax
-        call    printf
-
-        ret
-
-
-    f1_thread:
-        LOAD_THREAD_STACK
-        pop     rdi
-        call    f1_yield
-        KILL_THREAD
-    f1_yield:
+    receive:
         push    rdi
-        YIELD f1_body
-    f1_body:
+        YIELD   receive_yield
+    receive_yield:
         LOAD_THREAD_STACK
-        pop     rdi
-        call    f0_yield
+        mov     rdi, [rsp]
+        call    channel_ready
+
+        test    rax, rax ; NOTE: if (channel_ready()) { ...
+        jz      receive_else
+    ; receive_if_then:
+        mov     rdi, [rsp]
+        call    pop_channel
+        add     rsp, 8
+        ret
+    receive_else:
+        mov     rdi, [CURRENT_THREAD]
+        call    pause_thread
+        mov     rdi, [rsp]
+        mov     rsi, [CURRENT_THREAD]
+        call    push_waiting
+        YIELD   receive_yield
+
+
+    send:
+        call    push_channel
+        YIELD   send_yield
+    send_yield:
+        LOAD_THREAD_STACK
         ret
 
 
-    f2_thread:
-        LOAD_THREAD_STACK
-        call    f2_yield
-        KILL_THREAD
-    f2_yield:
-        YIELD f2_body
-    f2_body:
+; ping_pong in out done message {
+;     let n {
+;         (receive in)
+;     }
+;     if (= n 0) {
+;         (send done 0)
+;     } else {
+;         (printf "%s\n" message)
+;         (send out (- n 1))
+;         (ping_pong in out done message)
+;     }
+; }
+    ping_pong_thread:
         LOAD_THREAD_STACK
 
-        mov     rdi, f1_thread
-        call    new_thread
-
+        mov     rdi, [rsp + (8 * 3)]
+        call    receive
         push    rax
 
-        mov     rdi, SHOW_CREATE
+        test    rax, rax ; NOTE: if (rax == 0) { ...
+        jnz     ping_pong_else
+    ; ping_pong_if_then:
+        mov     rdi, [rsp + (8 * 2)]
+        mov     rsi, DONE
+        call    send
+        KILL_THREAD
+    ping_pong_else:
+        mov     rdi, [rsp + 8]
+        xor     eax, eax
+        call    printf
+
+        mov     rdi, [rsp + (8 * 3)]
         mov     rsi, [rsp]
-        xor     eax, eax
-        call    printf
+        sub     rsi, 1
+        call    send
 
-        pop     rdi
-        mov     rsi, HELLO1
-        call    push_thread
-
-        mov     rdi, HELLO2
-        call    f1_yield
-
-        ret
+        add     rsp, 8
+        YIELD   ping_pong_thread
 
 
-    f3_thread:
-        LOAD_THREAD_STACK
-        call    f3_yield
-        KILL_THREAD
-    f3_yield:
-        YIELD f3_body
-    f3_body:
-        LOAD_THREAD_STACK
-
-        mov     rdi, f2_thread
-        call    new_thread
-
-        mov     rdi, SHOW_CREATE
-        mov     rsi, rax
-        xor     eax, eax
-        call    printf
-
-        ret
-
-
-    entry_thread:
-        LOAD_THREAD_STACK
-        call    entry_yield
-        KILL_THREAD
-    entry_yield:
-        YIELD entry_body
-    entry_body:
+; main {
+;     let ping {
+;         (channel)
+;     }
+;     let pong {
+;         (channel)
+;     }
+;     let done {
+;         (channel)
+;     }
+;     (spawn ping_pong ping pong done "ping")
+;     (spawn ping_pong pong ping done "pong")
+;     (receive done)
+;     (printf "Done!\n")
+; }
+    main_thread:
         LOAD_THREAD_STACK
 
-        mov     rdi, f0_thread
-        call    new_thread
-
+        call    new_channel     ; NOTE: let ping { ...
         push    rax
 
-        mov     rdi, SHOW_CREATE
-        mov     rsi, [rsp]
-        xor     eax, eax
-        call    printf
+        call    new_channel     ; NOTE: let pong { ...
+        push    rax
 
-        pop     rdi
-        mov     rsi, HELLO0
-        call    push_thread ; NOTE: Push function arguments onto the stack.
+        call    new_channel     ; NOTE: let done { ...
+        push    rax
 
-        mov     rdi, f3_thread
+
+        mov     rdi, ping_pong_thread
         call    new_thread
+        push    rax
 
-        mov     rdi, SHOW_CREATE
-        mov     rsi, rax
+        mov     rdi, [rsp]
+        mov     rsi, [rsp + (8 * 3)]
+        call    push_thread_stack
+
+        mov     rdi, [rsp]
+        mov     rsi, [rsp + (8 * 2)]
+        call    push_thread_stack
+
+        mov     rdi, [rsp]
+        mov     rsi, [rsp + 8]
+        call    push_thread_stack
+
+        mov     rdi, [rsp]
+        mov     rsi, PING
+        call    push_thread_stack
+
+        add     rsp, 8
+
+
+        mov     rdi, ping_pong_thread
+        call    new_thread
+        push    rax
+
+        mov     rdi, [rsp]
+        mov     rsi, [rsp + (8 * 2)]
+        call    push_thread_stack
+
+        mov     rdi, [rsp]
+        mov     rsi, [rsp + (8 * 3)]
+        call    push_thread_stack
+
+        mov     rdi, [rsp]
+        mov     rsi, [rsp + 8]
+        call    push_thread_stack
+
+        mov     rdi, [rsp]
+        mov     rsi, PONG
+        call    push_thread_stack
+
+        add     rsp, 8
+
+
+        mov     rdi, [rsp + (8 * 2)]
+        mov     rsi, 5
+        call    send
+
+        mov     rdi, [rsp]
+        call    receive
+
+        mov     rdi, rax
         xor     eax, eax
         call    printf
 
-        call    f3_yield
-
-        ret
+        KILL_THREAD
 
 
     main:
-        push    rbp
-        mov     rbp, rsp
-
-        mov     rdi, entry_thread
+        mov     rdi, main_thread
         call    new_thread
-
-        mov     rdi, SHOW_CREATE
-        mov     rsi, rax
-        xor     eax, eax
-        call    printf
-
-        mov     rdi, entry_thread
-        call    new_thread
-
-        mov     rdi, SHOW_CREATE
-        mov     rsi, rax
-        xor     eax, eax
-        call    printf
-
-        mov     rsp, rbp
-        pop     rbp
 
         mov     qword [SCHED_RSP], rsp
         mov     qword [SCHED_RBP], rbp
