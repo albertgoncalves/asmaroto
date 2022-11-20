@@ -4,6 +4,7 @@ set -eu
 
 flags_c=(
     "-ferror-limit=1"
+    -fshort-enums
     "-march=native"
     -O3
     "-std=c99"

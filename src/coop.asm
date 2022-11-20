@@ -2,23 +2,21 @@ format ELF64
 
 public main
 
-public CURRENT_THREAD
+public THREAD
 
 extrn printf
 
 extrn scheduler
 
-extrn new_thread
-extrn push_thread_stack
-extrn pause_thread
-extrn kill_thread
+extrn thread_new
+extrn thread_kill
+extrn thread_push_stack
 
-extrn push_waiting
-
-extrn new_channel
+extrn channel_new
 extrn channel_ready
-extrn push_channel
-extrn pop_channel
+extrn channel_push_data
+extrn channel_push_wait
+extrn channel_pop_data
 
 section '.rodata'
     PING db " - ping -", 0xA, 0
@@ -26,37 +24,36 @@ section '.rodata'
     DONE db "Done!", 0xA, 0
 
 section '.bss' writeable
-    SCHED_RBP      rq 1
-    SCHED_RSP      rq 1
-    CURRENT_THREAD rq 1
+    SCHED_RBP rq 1
+    SCHED_RSP rq 1
+    THREAD    rq 1
 
 section '.text' executable
 
-    macro JUMP_TO_SCHED {
+    macro JUMP_SCHED {
         mov     rsp, qword [SCHED_RSP]
         mov     rbp, qword [SCHED_RBP]
         jmp     scheduler
     }
 
     macro LOAD_THREAD_STACK {
-        mov     rax, [CURRENT_THREAD]
+        mov     rax, [THREAD]
         mov     rsp, [rax + 8]       ; NOTE: If the `Thread` struct is
         mov     rbp, [rax + (8 * 2)] ; re-ordered, this will break. Watch out!
     }
 
     macro YIELD address {
-        mov     rax, [CURRENT_THREAD]
+        mov     rax, [THREAD]
         mov     qword [rax + 8], rsp
         mov     qword [rax + (8 * 2)], rbp ; NOTE: Stash stack pointers.
         mov     qword [rax], address       ; NOTE: Stash resume address.
-        JUMP_TO_SCHED
+        JUMP_SCHED
     }
 
     macro KILL_THREAD {
-        mov     rdi, [CURRENT_THREAD]
-        call    kill_thread
-
-        JUMP_TO_SCHED
+        mov     rdi, [THREAD]
+        call    thread_kill
+        JUMP_SCHED
     }
 
 
@@ -72,20 +69,18 @@ section '.text' executable
         jz      receive_else
     ; receive_if_then:
         mov     rdi, [rsp]
-        call    pop_channel
+        call    channel_pop_data
         add     rsp, 8
         ret
     receive_else:
-        mov     rdi, [CURRENT_THREAD]
-        call    pause_thread
         mov     rdi, [rsp]
-        mov     rsi, [CURRENT_THREAD]
-        call    push_waiting
+        mov     rsi, [THREAD]
+        call    channel_push_wait
         YIELD   receive_yield
 
 
     send:
-        call    push_channel
+        call    channel_push_data
         YIELD   send_yield
     send_yield:
         LOAD_THREAD_STACK
@@ -150,58 +145,58 @@ section '.text' executable
     main_thread:
         LOAD_THREAD_STACK
 
-        call    new_channel     ; NOTE: let ping { ...
+        call    channel_new     ; NOTE: let ping { ...
         push    rax
 
-        call    new_channel     ; NOTE: let pong { ...
+        call    channel_new     ; NOTE: let pong { ...
         push    rax
 
-        call    new_channel     ; NOTE: let done { ...
+        call    channel_new     ; NOTE: let done { ...
         push    rax
 
 
         mov     rdi, ping_pong_thread
-        call    new_thread
+        call    thread_new
         push    rax
 
         mov     rdi, [rsp]
         mov     rsi, [rsp + (8 * 3)]
-        call    push_thread_stack
+        call    thread_push_stack
 
         mov     rdi, [rsp]
         mov     rsi, [rsp + (8 * 2)]
-        call    push_thread_stack
+        call    thread_push_stack
 
         mov     rdi, [rsp]
         mov     rsi, [rsp + 8]
-        call    push_thread_stack
+        call    thread_push_stack
 
         mov     rdi, [rsp]
         mov     rsi, PING
-        call    push_thread_stack
+        call    thread_push_stack
 
         add     rsp, 8
 
 
         mov     rdi, ping_pong_thread
-        call    new_thread
+        call    thread_new
         push    rax
 
         mov     rdi, [rsp]
         mov     rsi, [rsp + (8 * 2)]
-        call    push_thread_stack
+        call    thread_push_stack
 
         mov     rdi, [rsp]
         mov     rsi, [rsp + (8 * 3)]
-        call    push_thread_stack
+        call    thread_push_stack
 
         mov     rdi, [rsp]
         mov     rsi, [rsp + 8]
-        call    push_thread_stack
+        call    thread_push_stack
 
         mov     rdi, [rsp]
         mov     rsi, PONG
-        call    push_thread_stack
+        call    thread_push_stack
 
         add     rsp, 8
 
@@ -222,7 +217,7 @@ section '.text' executable
 
     main:
         mov     rdi, main_thread
-        call    new_thread
+        call    thread_new
 
         mov     qword [SCHED_RSP], rsp
         mov     qword [SCHED_RBP], rbp
