@@ -1,10 +1,15 @@
 format ELF64
 
-public main
-
-public THREAD
+public main_thread
 
 extrn printf
+
+extrn THREAD
+extrn SCHED_RSP
+extrn SCHED_RBP
+
+extrn receive
+extrn send
 
 extrn scheduler
 
@@ -13,20 +18,11 @@ extrn thread_kill
 extrn thread_push_stack
 
 extrn channel_new
-extrn channel_ready
-extrn channel_push_data
-extrn channel_push_wait
-extrn channel_pop_data
 
 section '.rodata'
     PING db " - ping -", 0xA, 0
     PONG db " - pong -", 0xA, 0
     DONE db "Done!", 0xA, 0
-
-section '.bss' writeable
-    SCHED_RBP rq 1
-    SCHED_RSP rq 1
-    THREAD    rq 1
 
 section '.text' executable
 
@@ -55,36 +51,6 @@ section '.text' executable
         call    thread_kill
         JUMP_SCHED
     }
-
-
-    receive:
-        push    rdi
-        YIELD   receive_yield
-    receive_yield:
-        LOAD_THREAD_STACK
-        mov     rdi, [rsp]
-        call    channel_ready
-
-        test    rax, rax ; NOTE: if (channel_ready()) { ...
-        jz      receive_else
-    ; receive_if_then:
-        mov     rdi, [rsp]
-        call    channel_pop_data
-        add     rsp, 8
-        ret
-    receive_else:
-        mov     rdi, [rsp]
-        mov     rsi, [THREAD]
-        call    channel_push_wait
-        YIELD   receive_yield
-
-
-    send:
-        call    channel_push_data
-        YIELD   send_yield
-    send_yield:
-        LOAD_THREAD_STACK
-        ret
 
 
 ; ping_pong in out done message {
@@ -213,12 +179,3 @@ section '.text' executable
         call    printf
 
         KILL_THREAD
-
-
-    main:
-        mov     rdi, main_thread
-        call    thread_new
-
-        mov     qword [SCHED_RSP], rsp
-        mov     qword [SCHED_RBP], rbp
-        jmp     scheduler

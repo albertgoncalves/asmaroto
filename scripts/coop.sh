@@ -17,7 +17,8 @@ flags_c=(
 
 clang-format -i -verbose "$WD/src/"coop.c
 clang "${flags_c[@]}" -c -o "$WD/bin/c_coop.o" "$WD/src/coop.c"
+fasm "$WD/src/coop_runtime.asm" "$WD/bin/asm_coop_runtime.o"
 fasm "$WD/src/coop.asm" "$WD/bin/asm_coop.o"
 mold -run clang -no-pie -o "$WD/bin/coop" "$WD/bin/c_coop.o" \
-    "$WD/bin/asm_coop.o"
+    "$WD/bin/asm_coop.o" "$WD/bin/asm_coop_runtime.o"
 "$WD/bin/coop" || echo "$?"
