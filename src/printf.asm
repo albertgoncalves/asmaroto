@@ -24,5 +24,5 @@ main:
 
 section '.rodata'
 
+_string db 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33, 0
 _format db "[pid: %d]", 0xA, "%s", 0xA, 0
-_string db "Hello, world!"
