@@ -55,7 +55,7 @@ section '.text' executable
 
         mov     r8, qword [rdi]
         and     r8, 1
-        cmp     r8, 0
+        test    r8, r8
         jnz     _if_else
 
         add     qword [rdi], 29
