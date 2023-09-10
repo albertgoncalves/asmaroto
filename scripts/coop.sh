@@ -13,6 +13,7 @@ flags_c=(
     -Wno-declaration-after-statement
     -Wno-padded
     -Wno-pointer-arith
+    -Wno-unsafe-buffer-usage
 )
 
 clang-format -i -verbose "$WD/src/"coop.c

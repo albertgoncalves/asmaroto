@@ -10,6 +10,7 @@ flags_c=(
     -Werror
     -Weverything
     -Wno-declaration-after-statement
+    -Wno-unsafe-buffer-usage
 )
 
 clang-format -i -verbose "$WD/src/"closure.c
