@@ -8,13 +8,15 @@ SYS_EXIT equ 60
 
 
 section '.rodata'
-    _format db "%ld", 0xA, 0
+    _format db "%ld (%lu)", 0xA, 0
 
 
 section '.text' executable
     main:
         push    rbp
         mov     rbp, rsp
+
+        xor     rdx, rdx
 
         mov     rdi, 3
         mov     rsi, 10
@@ -31,6 +33,8 @@ section '.text' executable
 
 
     ackermann_peter:
+        inc     rdx
+
         test    rdi, rdi
         jnz     _else_0
 

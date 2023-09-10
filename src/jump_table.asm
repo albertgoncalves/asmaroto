@@ -4,13 +4,13 @@ public main
 
 extrn printf
 
-section '.rodata'
+section ".rodata"
     TABLE   dq t0, t1
-    STR_I32 db '  %d', 0xA, 0
-    STR_T0  db '@t0', 0xA, 0
-    STR_T1  db '@t1', 0xA, 0
+    STR_I32 db "  %d", 0xA, 0
+    STR_T0  db "@t0", 0xA, 0
+    STR_T1  db "@t1", 0xA, 0
 
-section '.text' executable
+section ".text" executable
 
 macro F_PRINT {
         call    f
