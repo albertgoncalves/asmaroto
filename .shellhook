@@ -14,10 +14,11 @@ runa () {
 
 runc () {
     handle=$(echo "$1" | sed 's/^[a-z\/]*\/\(.*\)\.[a-z]*$/\1/')
+    args=("$@")
     fasm "$1" "$WD/bin/${handle}".o \
         && mold -run clang -no-pie -o "$WD/bin/${handle}" \
             "$WD/bin/${handle}".o \
-        && "$WD/bin/${handle}"
+        && "$WD/bin/${handle}" "${args[@]:1}"
 }
 
 export -f runa
