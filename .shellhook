@@ -7,16 +7,27 @@ if [ ! -d "$WD/bin" ]; then
 fi
 
 runa () {
-    handle=$(echo "$1" | sed 's/^[a-z\/]*\/\(.*\)\.[a-z]*$/\1/')
+    handle=$(basename "${1%%.*}")
+    args=("$@")
     fasm "$1" "$WD/bin/${handle}" \
-        && "$WD/bin/${handle}"
+        && "$WD/bin/${handle}" "${args[@]:1}"
 }
 
 runc () {
-    handle=$(echo "$1" | sed 's/^[a-z\/]*\/\(.*\)\.[a-z]*$/\1/')
+    handle=$(basename "${1%%.*}")
     args=("$@")
     fasm "$1" "$WD/bin/${handle}".o \
         && mold -run clang -no-pie -o "$WD/bin/${handle}" \
+            "$WD/bin/${handle}".o \
+        && "$WD/bin/${handle}" "${args[@]:1}"
+}
+
+runl () {
+    handle=$(basename "${1%%.*}")
+    args=("$@")
+    fasm "$1" "$WD/bin/${handle}".o \
+        && mold -o "$WD/bin/${handle}" -L "/usr/lib/" -lc \
+            -dynamic-linker "/usr/lib64/ld-linux-x86-64.so.2" \
             "$WD/bin/${handle}".o \
         && "$WD/bin/${handle}" "${args[@]:1}"
 }
