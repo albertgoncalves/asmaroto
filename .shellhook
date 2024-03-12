@@ -34,3 +34,4 @@ runl () {
 
 export -f runa
 export -f runc
+export -f runl
