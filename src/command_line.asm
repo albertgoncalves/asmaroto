@@ -33,5 +33,5 @@ section '.text' executable
         jmp     while_start
 
     while_end:
-        xor     eax,    eax
+        xor     edi,    edi
         call    _exit

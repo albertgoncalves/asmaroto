@@ -12,7 +12,7 @@ section '.text' executable
     _start:
         call    f
 
-        xor     eax,    eax
+        xor     edi,    edi
         call    _exit
 
     ; function f() {
