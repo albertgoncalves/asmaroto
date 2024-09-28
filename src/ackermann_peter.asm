@@ -1,64 +1,55 @@
 format ELF64
 
+public _start
+
+extrn _exit
+
 extrn printf
-
-public main
-
-SYS_EXIT equ 60
 
 
 section '.rodata'
-    _format db "%ld (%lu)", 0xA, 0
+    format_i64 db "%ld (%zu)", 0xA, 0
 
 
 section '.text' executable
-    main:
+    _start:
         push    rbp
         mov     rbp, rsp
 
         xor     rdx, rdx
 
-        mov     rdi, 3
         mov     rsi, 10
+        mov     rdi, 3
         call    ackermann_peter
 
         mov     rsi, rax
-        mov     rdi, _format
+        mov     rdi, format_i64
         xor     eax, eax
         call    printf
 
-        mov     rsp, rbp
-        pop     rbp
-        ret
-
+        xor     edi, edi
+        call    _exit
 
     ackermann_peter:
         inc     rdx
 
+    __if_m_eq_0:
         test    rdi, rdi
-        jnz     _else_0
-
+        jnz     __if_n_eq_0
         mov     rax, rsi
         inc     rax
-
         ret
-
-    _else_0:
+    __if_n_eq_0:
         test    rsi, rsi
-        jnz     _else_1
-
+        jnz     __else
         dec     rdi
         mov     rsi, 1
         jmp     ackermann_peter
-
-    _else_1:
+    __else:
         push    rdi
-
         dec     rsi
         call    ackermann_peter
-
         mov     rsi, rax
         pop     rdi
         dec     rdi
-
         jmp     ackermann_peter

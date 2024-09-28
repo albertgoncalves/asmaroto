@@ -7,11 +7,16 @@ extrn _exit
 extrn printf
 
 section '.rodata'
-    format_i64 db "%ld", 10, 0
+    format_i64 db "%ld (%zu)", 10, 0
 
 section '.text' executable
     _start:
-        mov     rdx, 11
+        push    rbp
+        mov     rbp, rsp
+
+        xor     rcx, rcx
+
+        mov     rdx, 10
         mov     rsi, 3
         mov     rdi, print
         call    ackermann_peter_cps
@@ -20,6 +25,7 @@ section '.text' executable
         call    _exit
 
     print:
+        mov     rdx, rcx
         mov     rsi, rdi
         mov     rdi, format_i64
         xor     eax, eax
@@ -27,6 +33,8 @@ section '.text' executable
         ret
 
     ackermann_peter_cps:
+        inc     rcx
+
     __if_m_eq_0:
         test    rsi, rsi
         jnz     __if_n_eq_0
