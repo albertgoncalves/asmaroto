@@ -32,6 +32,13 @@ section '.text' executable
         call    printf
         ret
 
+    ackermann_peter_cps_inner:
+        mov     rdx, rdi
+        pop     rdi
+        pop     rsi
+        dec     rsi
+        ; jmp     ackermann_peter_cps
+
     ackermann_peter_cps:
         inc     rcx
 
@@ -53,11 +60,4 @@ section '.text' executable
         push    rdi
         dec     rdx
         mov     rdi, ackermann_peter_cps_inner
-        jmp     ackermann_peter_cps
-
-    ackermann_peter_cps_inner:
-        mov     rdx, rdi
-        pop     rdi
-        pop     rsi
-        dec     rsi
         jmp     ackermann_peter_cps
