@@ -8,7 +8,7 @@ extrn printf
 
 
 section '.rodata'
-    format_i64 db "%ld (%zu)", 0xA, 0
+    format_u64 db "%lu (%zu)", 0xA, 0
 
 
 section '.text' executable
@@ -23,7 +23,7 @@ section '.text' executable
         call    ackermann_peter
 
         mov     rsi, rax
-        mov     rdi, format_i64
+        mov     rdi, format_u64
         xor     eax, eax
         call    printf
 
