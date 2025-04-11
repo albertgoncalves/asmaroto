@@ -12,27 +12,27 @@ section '.rodata'
     string_i64   db "%ld", 10, 0
 
 section '.bss' writeable
-    OBJECT rq 4
+    OBJECT rq 3
 
 section '.text' executable
     _start:
         push    rbp
         mov     rbp, rsp
 
-        mov     qword [OBJECT], work
-        mov     qword [OBJECT + 8], 0
-        mov     qword [OBJECT + (8 * 2)], force
+        mov     qword [OBJECT], force
+        mov     qword [OBJECT + 8], work
+        mov     qword [OBJECT + (8 * 2)], 0
 
         mov     rdi, OBJECT
-        mov     rax, [OBJECT + (8 * 2)]
+        mov     rax, [OBJECT]
         call    rax
 
         mov     rdi, OBJECT
-        mov     rax, [OBJECT + (8 * 2)]
+        mov     rax, [OBJECT]
         call    rax
 
         mov     rdi, OBJECT
-        mov     rax, [OBJECT + (8 * 2)]
+        mov     rax, [OBJECT]
         call    rax
 
         mov     rsi, rax
@@ -54,23 +54,25 @@ section '.text' executable
         mov     rax, 123
         ret
 
-    ; Lazy {
-    ;     func:  (void*) -> void*
-    ;     args:  void*,
-    ;     force: (Lazy*) -> void*
-    ;     value: void*,
-    ; }
+    ; typedef struct {
+    ;     void* (*force)(void*);
+    ;     union {
+    ;         void* value;
+    ;         void* (*func)(void*);
+    ;     } _;
+    ;     void* args;
+    ; } Lazy;
 
     force:
         push    rdi
 
-        mov     rax, [rdi]
-        mov     rdi, [rdi + 8]
+        mov     rax, [rdi + 8]
+        mov     rdi, [rdi + (8 * 2)]
         call    rax
 
         pop     rdi
-        mov     qword [rdi + (8 * 3)], rax
-        mov     qword [rdi + (8 * 2)], cache
+        mov     qword [rdi], cache
+        mov     qword [rdi + 8], rax
 
         ret
 
@@ -83,5 +85,5 @@ section '.text' executable
 
         pop     rdi
 
-        mov     rax, [rdi + (8 * 3)]
+        mov     rax, [rdi + 8]
         ret
