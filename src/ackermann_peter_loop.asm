@@ -3,7 +3,6 @@ format ELF64
 public _start
 
 extrn _exit
-
 extrn printf
 
 section '.rodata'
@@ -28,7 +27,6 @@ section '.text' executable
 
         xor     edi, edi
         call    _exit
-
 
     ackermann_peter_loop:
         xor     rcx, rcx                    ; len

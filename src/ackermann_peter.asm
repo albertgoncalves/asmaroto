@@ -3,13 +3,10 @@ format ELF64
 public _start
 
 extrn _exit
-
 extrn printf
-
 
 section '.rodata'
     format_u64 db "%lu (%zu)", 0xA, 0
-
 
 section '.text' executable
     _start:

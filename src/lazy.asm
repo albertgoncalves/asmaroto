@@ -3,7 +3,6 @@ format ELF64
 public _start
 
 extrn _exit
-
 extrn printf
 extrn usleep
 
