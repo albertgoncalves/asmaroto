@@ -62,16 +62,15 @@ section '.text' executable
     ; }
 
     force:
-        mov     r8, rdi
-        mov     rax, [r8]
-        mov     rdi, [r8 + 8]
+        push    rdi
 
-        push    r8
+        mov     rax, [rdi]
+        mov     rdi, [rdi + 8]
         call    rax
-        pop     r8
 
-        mov     qword [r8 + (8 * 3)], rax
-        mov     qword [r8 + (8 * 2)], cache
+        pop     rdi
+        mov     qword [rdi + (8 * 3)], rax
+        mov     qword [rdi + (8 * 2)], cache
 
         ret
 
