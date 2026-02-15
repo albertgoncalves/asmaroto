@@ -19,21 +19,18 @@ section '.text' executable
         push    rbp
         mov     rbp, rsp
 
-        mov     qword [OBJECT], force
-        mov     qword [OBJECT + 8], work
-        mov     qword [OBJECT + (8 * 2)], 0
+        mov     [OBJECT], force
+        mov     [OBJECT + 8], work
+        mov     [OBJECT + (8 * 2)], 0
 
         mov     rdi, OBJECT
-        mov     rax, [OBJECT]
-        call    rax
+        call    [OBJECT]
 
         mov     rdi, OBJECT
-        mov     rax, [OBJECT]
-        call    rax
+        call    [OBJECT]
 
         mov     rdi, OBJECT
-        mov     rax, [OBJECT]
-        call    rax
+        call    [OBJECT]
 
         mov     rsi, rax
         mov     rdi, string_i64
@@ -72,7 +69,7 @@ section '.text' executable
 
         pop     rdi
         mov     qword [rdi], cache
-        mov     qword [rdi + 8], rax
+        mov     [rdi + 8], rax
 
         ret
 

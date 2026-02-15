@@ -288,7 +288,7 @@ Bool channel_ready(Channel* channel) {
     if (channel->data_first && channel->wait_first) {
         channel_pop_wait(channel);
     }
-    return channel->data_first != NULL;
+    return (Bool)(channel->data_first != NULL);
 }
 
 void channel_push_data(Channel* channel, void* data) {
